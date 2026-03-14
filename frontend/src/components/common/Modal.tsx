@@ -10,8 +10,15 @@ type Props = {
   onClose: () => void
   children: ReactNode
   footer?: ReactNode
-  size?: 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   className?: string
+}
+
+const SIZE_MAX: Record<NonNullable<Props['size']>, string> = {
+  sm: 'max-w-lg', // ~512px — detalle compacto
+  md: 'max-w-2xl',
+  lg: 'max-w-5xl',
+  xl: 'max-w-7xl',
 }
 
 export function Modal({
@@ -24,7 +31,7 @@ export function Modal({
   className = '',
 }: Props) {
   const titleId = useId()
-  const maxW = size === 'lg' ? 'max-w-2xl' : 'max-w-lg'
+  const maxW = SIZE_MAX[size]
 
   useEffect(() => {
     if (!open) return
@@ -57,7 +64,7 @@ export function Modal({
         className={`${styles.modalPanel} ${maxW} ${className}`}
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4">
+        <div className={styles.modalHeader}>
           <h2 id={titleId} className={`text-lg ${styles.heading}`}>
             {title}
           </h2>
@@ -70,13 +77,11 @@ export function Modal({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="px-5 py-4">{children}</div>
+        <div className={`${styles.modalBody} scrollbar-none`}>{children}</div>
         {footer ? (
-          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] px-5 py-4">
-            {footer}
-          </div>
+          <div className={styles.modalFooter}>{footer}</div>
         ) : (
-          <div className="flex justify-end border-t border-[var(--border)] px-5 py-4">
+          <div className={`${styles.modalFooter} justify-end`}>
             <Button type="button" variant="ghost" onClick={onClose}>
               Cerrar
             </Button>
