@@ -223,7 +223,8 @@ export function AuthPage() {
                     mode === 'register'
                       ? rhfStrongPassword
                       : (v) =>
-                          v.length >= 1 || 'La contraseña es obligatoria',
+                          (v?.length ?? 0) >= 6 ||
+                          'Mínimo 6 caracteres (igual que el servidor).',
                 })}
               />
               <button
@@ -270,6 +271,10 @@ export function AuthPage() {
                   className={`${styles.input} pl-10 pr-11`}
                   placeholder="••••••••"
                   {...registerField('passwordConfirm', {
+                    required:
+                      mode === 'register'
+                        ? 'Repite la contraseña'
+                        : false,
                     validate: (confirm) =>
                       rhfPasswordMatch(getValues('password'), confirm),
                   })}

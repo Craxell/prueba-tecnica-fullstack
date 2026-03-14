@@ -7,6 +7,7 @@ import {
 } from '../../../components/common'
 import { catalogSpriteUrl, type CatalogItem } from '../../../api/pokeapi'
 import { CATALOG_LIMIT } from '../constants'
+import { NOTES_MAX_LENGTH } from '../../../validators/notes'
 
 type Props = {
   catalogItems: CatalogItem[]
@@ -114,16 +115,24 @@ export function AddCatalogBody({
       <FormField
         id="add-notes"
         label="Notas (opcional)"
-        hint="Se guardan con el favorito."
+        hint={`Se guardan con el favorito. Máx. ${NOTES_MAX_LENGTH} caracteres.`}
       >
         <TextArea
           id="add-notes"
           value={addNotes}
+          maxLength={NOTES_MAX_LENGTH}
           disabled={catalogRefreshing}
-          onChange={(e) => onAddNotesChange(e.target.value)}
+          onChange={(e) => onAddNotesChange(e.target.value.slice(0, NOTES_MAX_LENGTH))}
           rows={3}
           placeholder="Opcional…"
+          aria-describedby="add-notes-count"
         />
+        <p
+          id="add-notes-count"
+          className="mt-1 text-right text-[10px] text-[var(--text)] tabular-nums"
+        >
+          {addNotes.length}/{NOTES_MAX_LENGTH}
+        </p>
       </FormField>
     </div>
   )

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { isAxiosError } from 'axios'
 import { createFavorite } from '../../../api/pokemon'
+import { notesLengthError } from '../../../validators/notes'
 import { catalog, type CatalogItem } from '../../../api/pokeapi'
 import { CATALOG_LIMIT } from '../constants'
 
@@ -61,6 +62,12 @@ export function useCatalogModal({
 
   const addFavorite = useCallback(async () => {
     if (!selected) return
+    const notesErr = notesLengthError(addNotes)
+    if (notesErr) {
+      setAddError(notesErr)
+      toast.error(notesErr)
+      return
+    }
     setAdding(true)
     setAddError(null)
     try {

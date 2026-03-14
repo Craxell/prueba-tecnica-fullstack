@@ -9,6 +9,7 @@ import {
   updateFavoriteNotes,
   type PokemonFavorite,
 } from '../../../api/pokemon'
+import { NOTES_MAX_LENGTH, notesLengthError } from '../../../validators/notes'
 
 export type DetailPanelMode = 'view' | 'edit'
 
@@ -42,7 +43,7 @@ export function PokemonDetailPanel({
     try {
       const data = await getFavorite(favoriteId)
       setPokemon(data)
-      setNotes(data.notes ?? '')
+      setNotes((data.notes ?? '').slice(0, NOTES_MAX_LENGTH))
     } catch (e) {
       if (isAxiosError(e) && e.response?.status === 401) {
         on401()
@@ -65,6 +66,12 @@ export function PokemonDetailPanel({
   }, [favoriteId, load])
 
   const handleSave = async () => {
+    const err = notesLengthError(notes)
+    if (err) {
+      setSaveMsg(err)
+      toast.error(err)
+      return
+    }
     setSaving(true)
     setSaveMsg(null)
     try {
@@ -190,14 +197,22 @@ export function PokemonDetailPanel({
               <TextArea
                 id="edit-notes"
                 rows={4}
+                maxLength={NOTES_MAX_LENGTH}
                 className="min-h-0 py-2 text-sm"
                 value={notes}
                 onChange={(e) => {
-                  setNotes(e.target.value)
+                  setNotes(e.target.value.slice(0, NOTES_MAX_LENGTH))
                   setSaveMsg(null)
                 }}
                 placeholder="Notas…"
+                aria-describedby="edit-notes-count"
               />
+              <p
+                id="edit-notes-count"
+                className="mt-1 text-right text-[10px] text-[var(--text)] tabular-nums"
+              >
+                {notes.length}/{NOTES_MAX_LENGTH}
+              </p>
             </FormField>
             <div className="flex flex-wrap items-center gap-2 border-t border-[var(--border)] pt-2">
               <Button
@@ -215,7 +230,10 @@ export function PokemonDetailPanel({
                 Guardar
               </Button>
               {saveMsg ? (
-                <span className="text-[10px] text-[var(--text)]">
+                <span
+                  className={`text-[10px] ${saveMsg.startsWith('Las notas') ? styles.error : 'text-[var(--text)]'}`}
+                  role={saveMsg.startsWith('Las notas') ? 'alert' : undefined}
+                >
                   {saveMsg}
                 </span>
               ) : null}
