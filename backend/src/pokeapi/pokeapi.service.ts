@@ -8,9 +8,28 @@ const BASE = 'https://pokeapi.co/api/v2'
 type PokeApiPokemon = {
   id: number
   name: string
-  sprites: { front_default: string | null }
+  sprites: {
+    front_default: string | null
+    /** Gen V animated = GIF cuando existe */
+    versions?: {
+      'generation-v'?: {
+        'black-white'?: {
+          animated?: { front_default?: string | null }
+        }
+      }
+    }
+  }
   types: { type: { name: string } }[]
   stats: { base_stat: number; stat: { name: string } }[]
+}
+
+/** GIF animado (PokeAPI) si existe; si no, PNG de front_default */
+function spriteUrl(data: PokeApiPokemon): string | null {
+  const gif =
+    data.sprites?.versions?.['generation-v']?.['black-white']?.animated
+      ?.front_default ?? null
+  if (gif) return gif
+  return data.sprites?.front_default ?? null
 }
 
 @Injectable()
@@ -47,7 +66,7 @@ export class PokeapiService {
     const row: PokeCache = {
       pokeapiId: data.id,
       name: data.name,
-      imageUrl: data.sprites.front_default,
+      imageUrl: spriteUrl(data),
       typesJson: data.types.map((t) => ({ name: t.type.name })),
       statsJson: data.stats.map((s) => ({
         name: s.stat.name,
