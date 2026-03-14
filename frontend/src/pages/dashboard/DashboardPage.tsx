@@ -66,8 +66,7 @@ export function DashboardPage() {
     <div className={`${styles.pageBg} px-4 py-8 sm:px-6`}>
       <header className="mx-auto mb-8 flex max-w-4xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className={`text-2xl ${styles.heading}`}>Dashboard</h1>
-          <p className="text-sm text-[var(--text)]">Tus Pokémon favoritos</p>
+          <h1 className={`text-2xl ${styles.heading}`}>Tus Pokémon favoritos</h1>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
