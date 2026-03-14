@@ -21,7 +21,7 @@ type Props = {
   onAddNotesChange: (v: string) => void
 }
 
-export function AddCatalogModalBody({
+export function AddCatalogBody({
   catalogItems,
   catalogTotal,
   catalogApiPage,

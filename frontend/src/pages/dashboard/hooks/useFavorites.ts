@@ -96,7 +96,6 @@ export function useFavorites({ token, onUnauthorized }: Args) {
     }
   }, [token, searchDebounced, typeFilter])
 
-  /** Tras guardar notas en el modal: misma fila al instante sin recargar lista. */
   const applyFavoriteUpdate = useCallback((updated: PokemonFavorite) => {
     setItems((prev) =>
       prev.map((it) => (it.id === updated.id ? { ...it, ...updated } : it)),

@@ -1,20 +1,16 @@
 import { Button, Modal } from '../../../components/common'
 
-type Target = { id: string; name: string }
-
-type Props = {
-  target: Target | null
-  loading: boolean
-  onClose: () => void
-  onConfirm: () => void
-}
-
 export function RemoveFavoriteModal({
   target,
   loading,
   onClose,
   onConfirm,
-}: Props) {
+}: {
+  target: { id: string; name: string } | null
+  loading: boolean
+  onClose: () => void
+  onConfirm: () => void
+}) {
   return (
     <Modal
       open={!!target}
@@ -33,11 +29,7 @@ export function RemoveFavoriteModal({
     >
       {target ? (
         <p className="text-left text-sm text-[var(--text)]">
-          ¿Quitar a{' '}
-          <strong className="capitalize text-[var(--text-h)]">
-            {target.name}
-          </strong>{' '}
-          de tus favoritos? Solo deja de aparecer en tu lista.
+          ¿Quitar a <strong className="capitalize text-[var(--text-h)]">{target.name}</strong> de tus favoritos?
         </p>
       ) : null}
     </Modal>

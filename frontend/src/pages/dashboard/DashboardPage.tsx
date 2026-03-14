@@ -1,26 +1,22 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Heart, LogOut, Plus } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { styles } from '../../constants/styles'
-import { PokemonDetailModal } from './components/PokemonDetailModal'
 import { FavoriteCard } from './components/FavoriteCard'
 import { FavoritesFilters } from './components/FavoritesFilters'
-import { AddCatalogModalBody } from './components/AddCatalogModalBody'
 import { RemoveFavoriteModal } from './components/RemoveFavoriteModal'
 import {
   Button,
   EmptyState,
-  Modal,
   Pagination,
   Spinner,
 } from '../../components/common'
 import { deleteFavorite } from '../../api/pokemon'
 import { FAVORITES_LIMIT } from './constants'
 import { useFavorites } from './hooks/useFavorites'
-import { useCatalogModal } from './hooks/useCatalogModal'
 
-export function HomePage() {
+export function DashboardPage() {
   const { token, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -31,42 +27,16 @@ export function HomePage() {
 
   const favorites = useFavorites({ token, onUnauthorized })
 
-  const [modalOpen, setModalOpen] = useState(false)
-  const catalog = useCatalogModal({
-    open: modalOpen,
-    onAdded: useCallback(async () => {
-      setModalOpen(false)
-      await favorites.loadFavorites()
-    }, [favorites.loadFavorites]),
-  })
-
   const [deleteTarget, setDeleteTarget] = useState<{
     id: string
     name: string
   } | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
-  const [detailModalId, setDetailModalId] = useState<string | null>(null)
-  const [detailModalMode, setDetailModalMode] = useState<'view' | 'edit'>(
-    'view',
-  )
 
   useEffect(() => {
     if (!token) navigate('/', { replace: true })
   }, [token, navigate])
 
-  const openDetail = useCallback((id: string, mode: 'view' | 'edit') => {
-    setDetailModalMode(mode)
-    setDetailModalId(id)
-  }, [])
-
-  const onDetail = useCallback(
-    (id: string) => openDetail(id, 'view'),
-    [openDetail],
-  )
-  const onEdit = useCallback(
-    (id: string) => openDetail(id, 'edit'),
-    [openDetail],
-  )
   const onRemoveFavorite = useCallback((id: string, name: string) => {
     setDeleteTarget({ id, name })
   }, [])
@@ -76,15 +46,14 @@ export function HomePage() {
     setDeleteLoading(true)
     try {
       await deleteFavorite(deleteTarget.id)
-      if (detailModalId === deleteTarget.id) setDetailModalId(null)
       setDeleteTarget(null)
       await favorites.loadFavorites()
     } catch {
-      /* modal abierto */
+      /* keep modal */
     } finally {
       setDeleteLoading(false)
     }
-  }, [deleteTarget, detailModalId, favorites.loadFavorites])
+  }, [deleteTarget, favorites.loadFavorites])
 
   if (!token) return null
 
@@ -96,10 +65,13 @@ export function HomePage() {
           <p className="text-sm text-[var(--text)]">Tus Pokémon favoritos</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Button variant="primary" onClick={() => setModalOpen(true)}>
+          <Link
+            to="/app/pokemon/new"
+            className={`inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold ${styles.radius.btn} ${styles.accent}`}
+          >
             <Plus className="h-4 w-4" />
             Añadir favorito
-          </Button>
+          </Link>
           <Button variant="ghost" onClick={onUnauthorized}>
             <LogOut className="h-4 w-4" />
             Salir
@@ -132,10 +104,13 @@ export function HomePage() {
             title="Aún no hay favoritos"
             description="Añade Pokémon desde el catálogo oficial (PokeAPI)."
             action={
-              <Button variant="primary" onClick={() => setModalOpen(true)}>
+              <Link
+                to="/app/pokemon/new"
+                className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-semibold ${styles.radius.btn} ${styles.accent}`}
+              >
                 <Plus className="h-4 w-4" />
                 Añadir favorito
-              </Button>
+              </Link>
             }
           />
         ) : (
@@ -158,8 +133,6 @@ export function HomePage() {
                   <FavoriteCard
                     key={f.id}
                     favorite={f}
-                    onDetail={onDetail}
-                    onEdit={onEdit}
                     onRemoveFavorite={onRemoveFavorite}
                   />
                 ))}
@@ -178,64 +151,12 @@ export function HomePage() {
         )}
       </main>
 
-      <PokemonDetailModal
-        open={!!detailModalId}
-        favoriteId={detailModalId}
-        mode={detailModalMode}
-        onClose={() => setDetailModalId(null)}
-        on401={onUnauthorized}
-        onNotesSaved={favorites.applyFavoriteUpdate}
-      />
-
       <RemoveFavoriteModal
         target={deleteTarget}
         loading={deleteLoading}
         onClose={() => setDeleteTarget(null)}
         onConfirm={handleConfirmDelete}
       />
-
-      <Modal
-        open={modalOpen}
-        onClose={() => !catalog.adding && setModalOpen(false)}
-        title="Añadir desde catálogo"
-        size="xl"
-        footer={
-          <>
-            <Button
-              variant="ghost"
-              disabled={catalog.adding}
-              onClick={() => setModalOpen(false)}
-            >
-              Cerrar
-            </Button>
-            <Button
-              variant="primary"
-              disabled={!catalog.selected || catalog.adding}
-              onClick={catalog.addFavorite}
-            >
-              {catalog.adding ? 'Guardando…' : 'Añadir a favoritos'}
-            </Button>
-          </>
-        }
-      >
-        {catalog.addError && (
-          <p className={`mb-3 ${styles.error}`} role="alert">
-            {catalog.addError}
-          </p>
-        )}
-        <AddCatalogModalBody
-          catalogItems={catalog.catalogItems}
-          catalogTotal={catalog.catalogTotal}
-          catalogApiPage={catalog.catalogApiPage}
-          catalogLoading={catalog.catalogLoading}
-          catalogRefreshing={catalog.catalogRefreshing}
-          selected={catalog.selected}
-          onSelect={catalog.setSelected}
-          onPageChange={catalog.loadCatalog}
-          addNotes={catalog.addNotes}
-          onAddNotesChange={catalog.setAddNotes}
-        />
-      </Modal>
     </div>
   )
 }
