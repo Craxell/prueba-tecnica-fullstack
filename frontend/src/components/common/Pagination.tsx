@@ -1,5 +1,18 @@
+import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { styles } from '../../constants/styles'
+
+function useNarrowPagination() {
+  const [narrow, setNarrow] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)')
+    const apply = () => setNarrow(mq.matches)
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+  return narrow
+}
 
 export type PaginationProps = {
   /** Página actual (1-based) */
@@ -36,7 +49,9 @@ export function Pagination({
   const canPrev = !disabled && safePage > 1
   const canNext = !disabled && safePage < totalPages
 
-  const windowSize = variant === 'wide' ? 7 : 5
+  const narrow = useNarrowPagination()
+  const windowSize =
+    variant === 'wide' ? (narrow ? 5 : 7) : narrow ? 3 : 5
   const pages = pageWindow(safePage, totalPages, windowSize)
   const btn = variant === 'wide' ? styles.paginationBtnLg : styles.paginationBtn
 
@@ -78,7 +93,8 @@ export function Pagination({
               </>
             )}
           </p>
-          <div className="flex w-full max-w-3xl flex-wrap items-center justify-center gap-2 sm:gap-3">
+          {/* Una sola fila: prev/next fijos; números en scroll horizontal si no caben (evita flex-wrap roto) */}
+          <div className="flex w-full max-w-3xl min-w-0 items-center gap-1.5 sm:gap-3">
             <button
               type="button"
               disabled={!canPrev}
@@ -88,31 +104,37 @@ export function Pagination({
             >
               <ChevronLeft className="h-5 w-5 sm:h-5 sm:w-5" />
             </button>
-            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2">
-              {pages.map((p, i) =>
-                p === '…' ? (
-                  <span
-                    key={`e-${i}`}
-                    className="flex min-w-10 items-center justify-center px-1 text-sm text-[var(--text)] sm:min-w-11"
-                    aria-hidden
-                  >
-                    …
-                  </span>
-                ) : (
-                  <button
-                    key={p}
-                    type="button"
-                    disabled={disabled}
-                    onClick={() => onPageChange(p)}
-                    className={`${btn} ${
-                      p === safePage ? styles.paginationBtnActive : ''
-                    } ${disabled ? 'opacity-50' : ''}`}
-                    aria-current={p === safePage ? 'page' : undefined}
-                  >
-                    {p}
-                  </button>
-                ),
-              )}
+            <div
+              className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain py-0.5 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-2 [&::-webkit-scrollbar]:hidden"
+              role="group"
+              aria-label="Números de página"
+            >
+              <div className="flex shrink-0 flex-nowrap items-center justify-center gap-1 sm:gap-2">
+                {pages.map((p, i) =>
+                  p === '…' ? (
+                    <span
+                      key={`e-${i}`}
+                      className="flex min-w-8 shrink-0 items-center justify-center px-0.5 text-sm text-[var(--text)] sm:min-w-10"
+                      aria-hidden
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <button
+                      key={p}
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => onPageChange(p)}
+                      className={`${btn} shrink-0 ${
+                        p === safePage ? styles.paginationBtnActive : ''
+                      } ${disabled ? 'opacity-50' : ''}`}
+                      aria-current={p === safePage ? 'page' : undefined}
+                    >
+                      {p}
+                    </button>
+                  ),
+                )}
+              </div>
             </div>
             <button
               type="button"
@@ -150,12 +172,12 @@ export function Pagination({
           </>
         )}
       </p>
-      <div className="flex flex-wrap items-center gap-1">
+      <div className="flex min-w-0 flex-nowrap items-center gap-1 overflow-x-auto overflow-y-hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:flex-wrap sm:overflow-x-visible">
         <button
           type="button"
           disabled={!canPrev}
           onClick={() => onPageChange(safePage - 1)}
-          className={`${styles.paginationBtn} ${disabled ? 'opacity-50' : ''}`}
+          className={`${styles.paginationBtn} shrink-0 ${disabled ? 'opacity-50' : ''}`}
           aria-label={labels.prev ?? 'Página anterior'}
         >
           <ChevronLeft className="h-4 w-4" />
@@ -175,7 +197,7 @@ export function Pagination({
               type="button"
               disabled={disabled}
               onClick={() => onPageChange(p)}
-              className={`${styles.paginationBtn} ${
+              className={`${styles.paginationBtn} shrink-0 ${
                 p === safePage ? styles.paginationBtnActive : ''
               } ${disabled ? 'opacity-50' : ''}`}
               aria-current={p === safePage ? 'page' : undefined}
@@ -188,7 +210,7 @@ export function Pagination({
           type="button"
           disabled={!canNext}
           onClick={() => onPageChange(safePage + 1)}
-          className={`${styles.paginationBtn} ${disabled ? 'opacity-50' : ''}`}
+          className={`${styles.paginationBtn} shrink-0 ${disabled ? 'opacity-50' : ''}`}
           aria-label={labels.next ?? 'Página siguiente'}
         >
           <ChevronRight className="h-4 w-4" />
