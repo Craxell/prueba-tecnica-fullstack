@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthPage } from './pages/AuthPage'
-import { HomePage } from './pages/HomePage'
+import { HomePage } from './pages/HomePage/HomePage'
 
 function App() {
   return (
