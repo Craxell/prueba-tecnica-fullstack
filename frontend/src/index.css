@@ -1,5 +1,37 @@
 @import "tailwindcss";
 
+/* Scroll funcional, barra oculta (Firefox + WebKit + IE legacy) */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+/* Modal: todo lo que haga scroll dentro del diálogo */
+[role='dialog'].modal-root,
+[role='dialog'].modal-root .modal-body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+[role='dialog'].modal-root .modal-body::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+}
+
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
 
 :root {
   --text: #6b6375;
