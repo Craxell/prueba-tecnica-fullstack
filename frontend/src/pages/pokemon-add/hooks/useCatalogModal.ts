@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import { isAxiosError } from 'axios'
 import { createFavorite } from '../../../api/pokemon'
 import { catalog, type CatalogItem } from '../../../api/pokeapi'
@@ -39,7 +40,9 @@ export function useCatalogModal({
       setCatalogTotal(res.total)
       setCatalogApiPage(res.page)
     } catch {
-      setAddError('No se pudo cargar el catálogo.')
+      const msg = 'No se pudo cargar el catálogo'
+      setAddError(msg)
+      toast.error(msg)
       setCatalogItems([])
       setCatalogTotal(0)
     } finally {
@@ -64,10 +67,17 @@ export function useCatalogModal({
       await createFavorite({ pokeapiId: selected.pokeapiId, notes: addNotes.trim() || undefined })
       setSelected(null)
       setAddNotes('')
+      toast.success(`${selected.name} añadido a favoritos`)
       await onAdded()
     } catch (e) {
-      if (isAxiosError(e) && e.response?.status === 409) setAddError('Ese Pokémon ya está en favoritos.')
-      else setAddError(isAxiosError(e) ? String(e.response?.data?.message || e.message) : 'No se pudo añadir')
+      if (isAxiosError(e) && e.response?.status === 409) {
+        setAddError('Ese Pokémon ya está en favoritos.')
+        toast.error('Already in favorites')
+      } else {
+        const msg = isAxiosError(e) ? String(e.response?.data?.message || e.message) : 'No se pudo añadir'
+        setAddError(msg)
+        toast.error('No se pudo añadir a favoritos')
+      }
     } finally {
       setAdding(false)
     }

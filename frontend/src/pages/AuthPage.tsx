@@ -21,6 +21,7 @@ import {
   validateStrongPassword,
 } from '../validators/authPassword'
 import { isAxiosError } from 'axios'
+import { toast } from 'sonner'
 
 type Mode = 'login' | 'register'
 
@@ -82,9 +83,12 @@ export function AuthPage() {
     try {
       if (mode === 'login') await login(data.email, data.password)
       else await register(data.email, data.password)
+      toast.success(mode === 'login' ? 'Sesión iniciada' : 'Cuenta creada')
       navigate('/app', { replace: true })
     } catch (e) {
-      setError(apiErrorMessage(e))
+      const msg = apiErrorMessage(e)
+      setError(msg)
+      toast.error(msg)
     }
   }
 

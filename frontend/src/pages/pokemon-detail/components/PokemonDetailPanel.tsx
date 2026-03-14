@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Loader2, Pencil, Save } from 'lucide-react'
+import { toast } from 'sonner'
 import { isAxiosError } from 'axios'
 import { Button, FormField, Spinner, TextArea } from '../../../components/common'
 import { styles } from '../../../constants/styles'
@@ -71,8 +72,10 @@ export function PokemonDetailPanel({
       setPokemon(updated)
       onNotesSaved?.(updated)
       setSaveMsg('Guardado.')
+      toast.success('Notas guardadas')
     } catch {
       setSaveMsg('Error al guardar.')
+      toast.error('No se pudieron guardar las notas')
     } finally {
       setSaving(false)
     }

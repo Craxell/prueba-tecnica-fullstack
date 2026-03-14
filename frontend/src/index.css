@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Sonner por encima de modales (z-50) */
+[data-sonner-toaster] {
+  z-index: 100 !important;
+}
+
 /* Scroll funcional, barra oculta (Firefox + WebKit + IE legacy) */
 .scrollbar-none {
   scrollbar-width: none;
