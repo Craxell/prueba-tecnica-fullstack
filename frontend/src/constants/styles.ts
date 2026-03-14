@@ -20,11 +20,21 @@ export const styles = {
     'border border-[var(--border)] bg-transparent text-[var(--text-h)] hover:bg-[var(--code-bg)] focus-visible:ring-2 focus-visible:ring-[var(--accent)]',
   btnDanger:
     'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg)]',
-  modalOverlay: 'fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center sm:p-6',
+  modalOverlay:
+    'fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-3 sm:items-center sm:p-4 md:p-6',
   modalPanel:
-    'max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--bg)] shadow-[var(--shadow)]',
+    'modal-root flex max-h-[85vh] w-full flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg)] shadow-[var(--shadow)] sm:max-h-[90vh]',
+  modalBody: 'modal-body min-h-0 flex-1 overflow-y-auto px-5 py-4',
+  modalHeader:
+    'flex shrink-0 items-start justify-between gap-4 border-b border-[var(--border)] px-5 py-4',
+  modalFooter:
+    'flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-[var(--border)] px-5 py-4',
   paginationBtn:
     'inline-flex min-h-9 min-w-9 items-center justify-center rounded-lg border border-[var(--border)] text-sm font-medium text-[var(--text-h)] transition-colors hover:bg-[var(--code-bg)] disabled:pointer-events-none disabled:opacity-40',
+  paginationBtnLg:
+    'inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-[var(--border)] text-sm font-medium text-[var(--text-h)] transition-colors hover:bg-[var(--code-bg)] disabled:pointer-events-none disabled:opacity-40 sm:min-h-11 sm:min-w-11',
+  paginationBar:
+    'w-full rounded-2xl border border-[var(--border)] bg-[var(--code-bg)]/25 px-3 py-3 sm:px-6 sm:py-4',
   paginationBtnActive:
     'border-[var(--accent)] bg-[var(--accent-bg)] text-[var(--accent)]',
   radius: { input: 'rounded-xl', btn: 'rounded-xl', card: 'rounded-2xl' },
