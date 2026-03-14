@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
 import { Heart, LogOut, Plus } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import { styles } from '../../constants/styles'
-import { FavoriteCard } from './components/FavoriteCard'
-import { FavoritesFilters } from './components/FavoritesFilters'
-import { RemoveFavoriteModal } from './components/RemoveFavoriteModal'
+import {
+  FavoriteCard,
+  FavoritesFilters,
+  RemoveFavoriteModal,
+} from './components/index.ts'
 import {
   Button,
   EmptyState,
@@ -45,11 +48,13 @@ export function DashboardPage() {
     if (!deleteTarget) return
     setDeleteLoading(true)
     try {
+      const name = deleteTarget.name
       await deleteFavorite(deleteTarget.id)
       setDeleteTarget(null)
       await favorites.loadFavorites()
+      toast.success(`${name} quitado de favoritos`)
     } catch {
-      /* keep modal */
+      toast.error('No se pudo quitar de favoritos')
     } finally {
       setDeleteLoading(false)
     }
