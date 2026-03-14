@@ -13,6 +13,7 @@ Monorepo con **frontend** (React + TypeScript + Vite) y **backend** (NestJS + My
 | `backend/`          | API REST NestJS, JWT, MySQL, caché local de datos PokeAPI                         |
 | `Prueba tecnica.md` | Enunciado original, criterios de evaluación y checklist                           |
 | `screenshots/`      | Capturas de la UI (referenciadas abajo)                                           |
+| `postman/`          | Colección Postman de la API                                                       |
 
 
 ---
@@ -224,7 +225,7 @@ Archivos en `screenshots/`.
 
 ## Entregables y documentación adicional
 
-- **Postman**: conviene una colección con los endpoints anteriores (el enunciado en `Prueba tecnica.md` lo pide como entregable).
+- **Postman**: importar `postman/Pokemon-Favoritos-API.postman_collection.json`. Variables: `base_url` (ej. `http://localhost:3000`), `token` (se rellena al ejecutar **Login**), `favorite_id` (UUID de un favorito tras listar o crear).
 - **README del backend**: `backend/README.md` (API, env, MySQL).
 - **Capturas de UI**: incluidas arriba y en la carpeta `screenshots/`.
 

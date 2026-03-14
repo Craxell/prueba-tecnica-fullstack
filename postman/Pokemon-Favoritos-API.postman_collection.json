@@ -1,0 +1,143 @@
+{
+  "info": {
+    "name": "Pokemon Favoritos API",
+    "description": "NestJS backend — auth JWT, CRUD favoritos, proxy PokeAPI.\n\n1. Ejecuta **Register** o **Login**; Login guarda `token` automáticamente.\n2. Rutas `/pokemon/*` usan Bearer `{{token}}`.\n3. Sustituye `{{favorite_id}}` por el UUID devuelto en GET /pokemon o POST /pokemon.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "favorite_id", "value": "00000000-0000-4000-8000-000000000000" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@ejemplo.com\",\n  \"password\": \"PasswordSeguro123\"\n}"
+            },
+            "url": "{{base_url}}/auth/register",
+            "description": "201/200 según implementación. Respuesta: `{ \"access_token\": \"...\" }`"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "try {",
+                  "  var j = pm.response.json();",
+                  "  if (j.access_token) pm.collectionVariables.set('token', j.access_token);",
+                  "} catch (e) {}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"usuario@ejemplo.com\",\n  \"password\": \"PasswordSeguro123\"\n}"
+            },
+            "url": "{{base_url}}/auth/login",
+            "description": "Guarda `access_token` en variable de colección `token`."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Pokemon (JWT)",
+      "auth": {
+        "type": "bearer",
+        "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+      },
+      "item": [
+        {
+          "name": "Listar favoritos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pokemon?page=0&limit=20&search=&type=",
+            "description": "Paginado. Query opcionales: search (nombre), type (ej. electric)."
+          }
+        },
+        {
+          "name": "Detalle favorito",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pokemon/{{favorite_id}}",
+            "description": "UUID del favorito (campo `id` en listado)."
+          }
+        },
+        {
+          "name": "Añadir favorito",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pokeapiId\": 25,\n  \"notes\": \"Nota opcional\"\n}"
+            },
+            "url": "{{base_url}}/pokemon",
+            "description": "`pokeapiId` = id nacional PokeAPI. Respuesta incluye `id` (UUID) para PUT/DELETE."
+          }
+        },
+        {
+          "name": "Actualizar notas",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Texto actualizado\"\n}"
+            },
+            "url": "{{base_url}}/pokemon/{{favorite_id}}"
+          }
+        },
+        {
+          "name": "Eliminar favorito",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}/pokemon/{{favorite_id}}",
+            "description": "Respuesta: `{ \"ok\": true }`"
+          }
+        }
+      ]
+    },
+    {
+      "name": "PokeAPI (público)",
+      "item": [
+        {
+          "name": "Catálogo paginado",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pokeapi/catalog?page=0",
+            "description": "20 resultados por página (índice 0-based). Sin JWT."
+          }
+        },
+        {
+          "name": "Pokémon por id o nombre",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}/pokeapi/pokemon/pikachu",
+            "description": "Sustituir `pikachu` por número (25) o nombre. Caché en servidor."
+          }
+        }
+      ]
+    }
+  ]
+}
